@@ -21,7 +21,6 @@ module.exports = {
         }
 
         var token = uptoken(bucket, key);
-        console.log(token)
         this.body = 'swallow qiniu token has generated!';
     },
     uploadImg: function*(){
@@ -37,11 +36,9 @@ module.exports = {
         var part;
 
         while (part = yield parts) {
-            console.log(part);
             if (!/image/.test(part.mimeType)) continue;
             var stream = fs.createWriteStream(path.resolve('./uploaded/' + part.filename));
             part.pipe(stream);
-            console.log('uploading %s -> %s', part.filename, stream.path);
         }
 
         this.redirect('/');

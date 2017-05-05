@@ -12,10 +12,10 @@ var sequelize = new Sequelize(DB.database, DB.username, DB.password, DB.config
 sequelize
     .authenticate()
     .then(function(err) {
-        console.log('Connection has been established successfully.');
+        console.log('数据库连接成功');
     })
     .catch(function (err) {
-        console.log('Unable to connect to the database:', err);
+        console.log('数据库连接失败', err);
     });
 
 

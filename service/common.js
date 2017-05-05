@@ -54,7 +54,6 @@ exports.publishImage = function* (files=[]){
     return Promise.all(promises).then(result=>{
         return Tool.prepareSuccess(true);
     }, err=>{
-        console.log(err);
         return Tool.prepareFailure(false, '上传云存储失败');
     })
 };

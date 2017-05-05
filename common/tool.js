@@ -115,7 +115,6 @@ getAKSK().then(aksk =>{
     qiniu.conf.SECRET_KEY = aksk.sk;
 
     AKSK = exports.AKSK = aksk;
-    console.log(aksk);
 });
 
 /**

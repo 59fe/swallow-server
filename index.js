@@ -4,6 +4,7 @@ var session = require('koa-session');
 var assets = require('koa-static');
 var appRouter = require('./router.js');
 var config = require('./config/config');
+var sessionConfig = require('./config/session')
 var path = require('path');
 var http = require('http');
 var fs = require('fs');
@@ -20,7 +21,8 @@ app.use(function *(next){
     }
     yield next;
 });
-app.use(session(app));
+app.keys = [sessionConfig.key]
+app.use(session(sessionConfig, app))
 // create log/
 if (!fs.existsSync('./log')){
     fs.mkdirSync('./log');
@@ -41,6 +43,11 @@ xtplApp(app,{
 var bodyParser = require('koa-bodyparser');
 app.use(bodyParser());
 
+app.use(function *(next) {
+  // console.log(this.cookies.get('tms-secret'))
+  console.log(this.session.userinfo)
+  yield next
+})
 
 appRouter(router);
 app

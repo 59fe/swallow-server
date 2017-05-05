@@ -4,7 +4,7 @@
   "description": "活动海报页可视化制作工具swallow 的服务端接口",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=local node --harmony app.js",
+    "start": "NODE_ENV=local node --harmony index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

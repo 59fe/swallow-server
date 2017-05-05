@@ -2,13 +2,20 @@
  * Created by yangxun on 16/7/7.
  */
 var Poster = require('../service/poster'),
-    Common = require('../service/common');
+    Common = require('../service/common'),
+    doLogin = require('./doLogin');
 
 module.exports = {
     /**
      * 保存到数据库
      */
     save: function*(){
+
+        if (!this.session.userinfo) {
+          doLogin()
+          return false
+        }
+
         var poster = this.request.body;
         var tempFiles = poster.tempFiles;
         var result = yield Common.publishImage(tempFiles);
@@ -42,7 +49,7 @@ module.exports = {
      * 获取自己创建的海报活动列表
      */
     findOwnerPoster: function*(){
-        var user_id = this.session.user_id,
+        var user_id = this.session.userinfo.uid,
             page = this.query.page,
             where = {
                 user_id: user_id
@@ -60,6 +67,12 @@ module.exports = {
      * 更新海报信息
      */
     update: function* (){
+
+        if (!this.session.userinfo) {
+          doLogin()
+          return false
+        }
+
         var id = this.request.body.id,
             params = this.request.body.params;
         var tempFiles = params.tempFiles;
@@ -77,6 +90,12 @@ module.exports = {
      * 更新关注状态
      */
     attention: function* (){
+
+        if (!this.session.userinfo) {
+          doLogin()
+          return false
+        }
+
         var id = this.request.body.id, attention = this.request.body.attention;
 
         this.body = yield Poster.attention(id, attention);
@@ -85,6 +104,12 @@ module.exports = {
      * 发布到CDN
      */
     publish: function* (){
+
+        if (!this.session.userinfo) {
+          doLogin()
+          return false
+        }
+
         var id = this.request.body.id,
             params = this.request.body.params;
 
@@ -101,6 +126,10 @@ module.exports = {
      */
     del: function* (id){
         var id = this.params.id;
+        if (!this.session.userinfo) {
+          doLogin()
+          return false
+        }
         this.body = yield Poster.del(id);
     }
 };

@@ -1,6 +1,5 @@
 //var md5 = require('')
 
 module.exports = function *(next) {
-    console.log(this)
-    this.redirect('/');
+    this.redirect('http://tms.dbike.me/#/login?referer=swallow');
 }
