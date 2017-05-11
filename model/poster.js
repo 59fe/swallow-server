@@ -4,7 +4,8 @@
 var sequelize = require('../common/db-helper'),
     Sequelize = require('sequelize'),
     moment = require('moment'),
-    ObjectId = require('../common/objectid').ObjectID;
+    ObjectId = require('../common/objectid').ObjectID
+
 /*
 * 海报model
 * */
@@ -64,8 +65,7 @@ var params = {
     }
 };
 
-
-var Poster = sequelize.define('poster', params,{
+var Poster = sequelize.define('swallow_poster', params,{
     indexes: [
         {
             unique: true,

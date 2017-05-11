@@ -20,9 +20,3 @@ function* two(){
 }
 
 var ite = two();
-console.log(ite);
-console.log(ite.next());
-console.log(ite.next());
-console.log(ite.next());
-console.log(ite.next());
-console.log(ite.next());

@@ -13,13 +13,14 @@ var config = {
     "logDir": path.join(__dirname,'..', 'log'),
 
     mysql: {
-        database: 'db59swallow_dev',
+        database: 'dbtms_dev',
         username: 'admin',
         password: 'admin',
         config: {
             host: '192.168.30.135',
             dialect: 'mysql',
             port: '3306',
+            logging: null,
             pool: {
               max: 5,
               min: 0,

@@ -3,6 +3,7 @@
  */
 var Model = require('../model'),
     Tool = require('../common/tool'),
+    sequelize = require('../common/db-helper'),
     ObjectId = require('../common/objectid').ObjectID;
 
 /**
@@ -112,6 +113,90 @@ exports.find = function*(where={}, page){
         Tool.logger.error(err);
         return Tool.prepareFailure(false, err);
     });
+};
+
+/**
+ * 根据指定条件查询(SQL版)
+ * @param where 过滤条件
+ * @param page 分页信息
+ * @returns {Promise.<T>}
+ */
+exports.findBySQL = function *(where, page){
+
+    var SQL = ''
+    var countSQL = ''
+    var rows = ''
+    var whereStr = ''
+    var { user_id, attentioned_only, owned_only, layout, title } = where
+    var limit = 20
+    var offset = 0
+
+    if (user_id) {
+
+      if (attentioned_only) {
+        rows = 'poster.*, rl.id AS attention'
+        whereStr = 'WHERE rl.source_id = ' + user_id + ' AND rl.type="swallow_attention"'
+        SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN relations rl ON rl.target_id = poster.id __WHERE_REPLACEMENT__'
+      } else if (owned_only) {
+        rows = 'poster.*'
+        whereStr = 'WHERE poster.user_id = ' + user_id
+        SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster __WHERE_REPLACEMENT__'
+      } else {
+        rows = 'poster.*, rl.id AS attention'
+        SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN (SELECT * FROM relations WHERE source_id = ' + user_id + ' AND type="swallow_attention") rl ON rl.target_id = poster.id __WHERE_REPLACEMENT__'
+      }
+
+    } else {
+      rows = 'poster.*'
+      SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster __WHERE_REPLACEMENT__'
+    }
+
+    if (layout) {
+      whereStr = whereStr || 'WHERE 1'
+      whereStr += ' AND poster.layout="' + layout + '"'
+    }
+
+    if (title) {
+      whereStr = whereStr || 'WHERE 1'
+      whereStr += ' AND poster.title LIKE "%' + title + '%"'
+    }
+
+    SQL = SQL.replace('__WHERE_REPLACEMENT__', whereStr)
+    countSQL = SQL.replace('__ROWS_REPLACEMENT__', 'COUNT(1) AS count')
+    SQL = SQL.replace('__ROWS_REPLACEMENT__', rows)
+    SQL += ' ORDER BY poster.createDate DESC,poster.updateDate DESC'
+
+    if (page) {
+      try{
+        limit = Number(page.size);
+        offset = page.size * page.index;
+        SQL += ' LIMIT ' + offset + ',' + limit
+      } catch (e) {
+        Tool.logger.error(e);
+      }
+    }
+
+    return Promise.all([
+      sequelize.query(countSQL).then(result => {
+        return result[0][0].count
+      }).catch(err=>{
+          return err;
+      }),
+      sequelize.query(SQL).then(result => {
+        return result[0]
+      }).catch(err=>{
+          return err;
+      })
+    ]).then(result=>{
+      return Tool.prepareSuccess({
+          total: result[0],
+          list: result[1]
+      })
+    }).catch(err=>{
+      Tool.logger.error(err);
+      return Tool.prepareFailure(false, err)
+    })
+
 };
 
 /**

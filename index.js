@@ -43,12 +43,6 @@ xtplApp(app,{
 var bodyParser = require('koa-bodyparser');
 app.use(bodyParser());
 
-app.use(function *(next) {
-  // console.log(this.cookies.get('tms-secret'))
-  console.log(this.session.userinfo)
-  yield next
-})
-
 appRouter(router);
 app
   .use(router.routes())

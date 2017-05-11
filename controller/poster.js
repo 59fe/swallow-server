@@ -1,9 +1,10 @@
 /**
  * Created by yangxun on 16/7/7.
  */
-var Poster = require('../service/poster'),
-    Common = require('../service/common'),
-    doLogin = require('./doLogin');
+const Poster = require('../service/poster')
+const Common = require('../service/common')
+const Relations = require('../service/relations')
+const doLogin = require('./doLogin')
 
 module.exports = {
     /**
@@ -19,17 +20,17 @@ module.exports = {
         var poster = this.request.body;
         var tempFiles = poster.tempFiles;
         var result = yield Common.publishImage(tempFiles);
-        if(result.status == 0){
+        poster.userId = this.session.userinfo.uid
+        if (result.status == 0) {
             this.body = yield Poster.save(poster);
-        }
-        else{
+        } else {
             this.body = result;
         }
     },
     /**
      * path唯一性校验
      */
-    check: function*(){
+    check: function *(){
         var path = this.query.path;
         var id = this.query.id;
         this.body = yield Poster.check(id, path);
@@ -37,24 +38,30 @@ module.exports = {
     /**
      * 根据自定义过滤条件查询
      */
-    find: function* (){
-        var where = this.query,
-            page = {
-                size: Number(where.size) || 20,
-                index: Number(where.index) || 0
-            };
-        this.body = yield Poster.find(where, page);
+    find: function *(){
+        var where = this.query || {};
+        var page = {
+            size: Number(where.size) || 20,
+            index: Number(where.index) || 0
+        }
+        if (this.session.userinfo) {
+          where.user_id = this.session.userinfo.uid
+        }
+        if (where.attention) {
+          where.attentioned_only = true
+        }
+        this.body = yield Poster.findBySQL(where, page);
     },
     /**
      * 获取自己创建的海报活动列表
      */
-    findOwnerPoster: function*(){
-        var user_id = this.session.userinfo.uid,
-            page = this.query.page,
-            where = {
-                user_id: user_id
-            };
-        this.body = yield Poster.find(where, page);
+    findOwnerPoster: function *(){
+        var page = this.query.page
+        var where = {
+          user_id: this.session.userinfo.uid,
+          owned_only: true
+        }
+        this.body = yield Poster.findBySQL(where, page);
     },
     /**
      * 根据ID查询海报详情
@@ -98,7 +105,20 @@ module.exports = {
 
         var id = this.request.body.id, attention = this.request.body.attention;
 
-        this.body = yield Poster.attention(id, attention);
+        if (attention) {
+          this.body = yield Relations.add({
+            source_id: this.session.userinfo.uid,
+            target_id: id,
+            type: 'swallow_attention'
+          })
+        } else {
+          this.body = yield Relations.remove({
+            source_id: this.session.userinfo.uid,
+            target_id: id,
+            type: 'swallow_attention'
+          })
+        }
+
     },
     /**
      * 发布到CDN
