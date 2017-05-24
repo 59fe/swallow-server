@@ -134,21 +134,21 @@ exports.findBySQL = function *(where, page){
     if (user_id) {
 
       if (attentioned_only) {
-        rows = 'poster.*, rl.id AS attention'
+        rows = 'poster.*, rl.id AS attention, user.uname AS author'
         whereStr = 'WHERE rl.source_id = ' + user_id + ' AND rl.type="swallow_attention"'
-        SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN relations rl ON rl.target_id = poster.id __WHERE_REPLACEMENT__'
+        SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN tms_user user ON user.uid = poster.userId LEFT JOIN relations rl ON rl.target_id = poster.id __WHERE_REPLACEMENT__'
       } else if (owned_only) {
-        rows = 'poster.*'
-        whereStr = 'WHERE poster.user_id = ' + user_id
-        SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster __WHERE_REPLACEMENT__'
+        rows = 'poster.*, user.uname AS author'
+        whereStr = 'WHERE poster.userId = ' + user_id
+        SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN tms_user user ON user.uid = poster.userId __WHERE_REPLACEMENT__'
       } else {
-        rows = 'poster.*, rl.id AS attention'
-        SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN (SELECT * FROM relations WHERE source_id = ' + user_id + ' AND type="swallow_attention") rl ON rl.target_id = poster.id __WHERE_REPLACEMENT__'
+        rows = 'poster.*, rl.id AS attention, user.uname AS author'
+        SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN tms_user user ON user.uid = poster.userId LEFT JOIN (SELECT * FROM relations WHERE source_id = ' + user_id + ' AND type="swallow_attention") rl ON rl.target_id = poster.id __WHERE_REPLACEMENT__'
       }
 
     } else {
-      rows = 'poster.*'
-      SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster __WHERE_REPLACEMENT__'
+      rows = 'poster.*, user.uname AS author'
+      SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN tms_user user ON user.uid = poster.userId __WHERE_REPLACEMENT__'
     }
 
     if (layout) {
