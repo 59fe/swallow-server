@@ -15,6 +15,7 @@ var params = {
         primaryKey: true,
         //defaultValue: function(){return new ObjectId().toHexString();}
     },
+    type: Sequelize.INTEGER,//页面类型，1：海报，2：活动文章
     layout: Sequelize.STRING(24),//页面布局类型，其值为mobile或者pc
     title: Sequelize.STRING(128), //页面标题
     userId: Sequelize.STRING,//创建人ID

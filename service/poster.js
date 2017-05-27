@@ -127,7 +127,7 @@ exports.findBySQL = function *(where, page){
     var countSQL = ''
     var rows = ''
     var whereStr = ''
-    var { user_id, attentioned_only, owned_only, layout, title } = where
+    var { user_id, type, attentioned_only, owned_only, layout, title } = where
     var limit = 20
     var offset = 0
 
@@ -135,19 +135,21 @@ exports.findBySQL = function *(where, page){
 
       if (attentioned_only) {
         rows = 'poster.*, rl.id AS attention, user.uname AS author'
-        whereStr = 'WHERE rl.source_id = ' + user_id + ' AND rl.type="swallow_attention"'
+        whereStr = 'WHERE rl.source_id = ' + user_id + ' AND rl.type="swallow_attention" AND poster.type = ' + type
         SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN tms_user user ON user.uid = poster.userId LEFT JOIN relations rl ON rl.target_id = poster.id __WHERE_REPLACEMENT__'
       } else if (owned_only) {
         rows = 'poster.*, user.uname AS author'
-        whereStr = 'WHERE poster.userId = ' + user_id
+        whereStr = 'WHERE poster.userId = ' + user_id + ' AND poster.type = ' + type
         SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN tms_user user ON user.uid = poster.userId __WHERE_REPLACEMENT__'
       } else {
         rows = 'poster.*, rl.id AS attention, user.uname AS author'
+        whereStr = 'WHERE poster.type = ' + type
         SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN tms_user user ON user.uid = poster.userId LEFT JOIN (SELECT * FROM relations WHERE source_id = ' + user_id + ' AND type="swallow_attention") rl ON rl.target_id = poster.id __WHERE_REPLACEMENT__'
       }
 
     } else {
       rows = 'poster.*, user.uname AS author'
+      whereStr = 'WHERE poster.type = ' + type
       SQL = 'SELECT __ROWS_REPLACEMENT__ FROM swallow_poster poster LEFT JOIN tms_user user ON user.uid = poster.userId __WHERE_REPLACEMENT__'
     }
 
