@@ -22,3 +22,10 @@ exports.qiniu = function* (){
         host: config.qiniu.cdnHost
     };
 };
+
+/**
+ * 获取七牛上传token
+ */
+exports.qiniuToken = function* (){
+    this.body = yield common.createQiniuToken(this.request.body.tokenID);
+}

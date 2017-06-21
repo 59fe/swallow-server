@@ -58,6 +58,12 @@ exports.publishImage = function* (files=[]){
     })
 };
 
+exports.createQiniuToken = function *(key) {
+    return {
+        uptoken: Tool.getUploadToken(key)
+    }
+}
+
 /**
  * 发布静态页面到七牛CDN
  * @param html

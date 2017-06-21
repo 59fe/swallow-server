@@ -188,3 +188,8 @@ exports.upload = function(fileName, content){
         });
     });
 }
+
+exports.getUploadToken = function() {
+    let putPolicy = new qiniu.rs.PutPolicy(config.qiniu.bucket);
+    return putPolicy.token();
+}

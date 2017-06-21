@@ -17,6 +17,7 @@ module.exports = function(router) {
     router.post('/poster/attention', poster.attention);      //更新关注状态
     router.delete('/poster/:id', poster.del);           //删除海报信息
 
+    router.post('/qiniu_token', common.qiniuToken) //获取token
     router.get('/qiniu', common.qiniu);           //获取域名相关信息
     router.post('/upload', common.uploadFile);      //上传文件
 
