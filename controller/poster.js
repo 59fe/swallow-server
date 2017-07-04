@@ -135,7 +135,7 @@ module.exports = {
 
         var result = yield Poster.update(id, params);
         if(result.status == 0){
-            this.body = yield Common.publishHtml(params.pathname, params.html);
+            this.body = yield Common.publishHtml(params.pathname, params.html, params.type);
         }
         else{
             this.body = result;

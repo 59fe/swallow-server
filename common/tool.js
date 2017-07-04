@@ -159,8 +159,10 @@ exports.uploadFile = function(key, localFile, clean=false) {
  * 构建线上地址
  * @param name
  */
-const buildRleaseUrl = exports.buildRleaseUrl = function(name){
-    return [config.qiniu.cdnHost, config.qiniu.prefix, '/', name].join('');
+const buildRleaseUrl = exports.buildRleaseUrl = function(name, type){
+    type = type || 1
+    let prefix = type === 2 ? 'article' : config.qiniu.prefix
+    return [config.qiniu.cdnHost, prefix, '/', name].join('');
 };
 
 /**
@@ -168,16 +170,18 @@ const buildRleaseUrl = exports.buildRleaseUrl = function(name){
  * @param content
  * @returns {Promise}
  */
-exports.upload = function(fileName, content){
+exports.upload = function(fileName, content, type){
+    type = type || 1
     let extra = new qiniu.io.PutExtra();
-    fileName = [config.qiniu.prefix, fileName].join('/');
+    let prefix = type === 2 ? 'article' : config.qiniu.prefix
+    fileName = [prefix, fileName].join('/');
 
     let token = uptoken(config.qiniu.bucket, fileName);
 
     return new Promise((resolve, reject) => {
         qiniu.io.put(token, fileName, content, extra, function(err, ret) {
             if(!err) {
-                let cdnUrl = buildRleaseUrl(ret.key);
+                let cdnUrl = buildRleaseUrl(ret.key, type);
                 // 上传成功， 处理返回值
                 resolve(cdnUrl);
             } else {

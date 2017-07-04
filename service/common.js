@@ -69,13 +69,13 @@ exports.createQiniuToken = function *(key) {
  * @param html
  * @returns {Promise.<T>}
  */
-exports.publishHtml = function* (fileName, html){
+exports.publishHtml = function* (fileName, html, type){
     html = minify(html, {
         collapseWhitespace: true,
         minifyCSS: true,
         minifyJS: true
     });
-    return Tool.upload(fileName, html).then(result =>{
+    return Tool.upload(fileName, html, type).then(result =>{
         return Tool.prepareSuccess(true);
     }).catch(err=>{
         return Tool.prepareFailure(false, '上传云存储失败');
