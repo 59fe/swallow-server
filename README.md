@@ -35,6 +35,8 @@ swallow-server/
 
 ````
 第三步: 启动服务 node index.js
+
+注意目前必须先 cd 到应用目录下(如/var/www/swallow-server/) 再执行命令,否则上传图片等功能会报错)
 ````
 
 
